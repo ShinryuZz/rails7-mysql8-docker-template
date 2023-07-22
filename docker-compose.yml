@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dev
+    ports:
+      - "3306:3306"
+    volumes:
+      - /var/lib/mysql
+    platform: linux/arm64 # Apple silicon の場合 ARM64でエミュレート
+    command: --default-authentication-plugin=mysql_native_password
+
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/develop/Dockerfile
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - .:/myapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
